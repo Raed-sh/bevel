@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: carrier-cacerts-job
+  namespace: carrier-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  interval: 1m
+  releaseName: carrier-cacerts-job
+  chart:
+    spec:
+      interval: 1m
+      sourceRef:
+        kind: GitRepository
+        name: flux-dev
+        namespace: flux-dev
+      chart: platforms/hyperledger-fabric/charts/generate_cacerts
+  values:
+    metadata:
+      name: carrier
+      component_name: carrier-net
+      namespace: carrier-net    
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    vault:
+      role: vault-role
+      address: http://a581b6f33f36145c9b381ff3c4012cd6-1055042004.us-east-1.elb.amazonaws.com:8200
+      authpath: devcarrier-net-auth
+      secretcryptoprefix: secretsfront/data/crypto/peerOrganizations/carrier-net/ca
+      secretcredentialsprefix: secretsfront/data/credentials/carrier-net/ca/carrier
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      
+    ca:
+      subject: /C=GB/ST=London/L=London/O=Carrier/CN=ca.carrier-net.org3ambassador.blockchaincloudpoc.com
